@@ -21,6 +21,15 @@ impl MintableAlkane {
   pub fn set_value_per_mint(&self, v: u128) {
     self.value_per_mint_pointer().set_value::<u128>(v);
   }
+  pub fn cap_pointer(&self) -> StoragePointer {
+    StoragePointer::from_keyword("/cap")
+  }
+  pub fn cap(&self) -> u128 {
+    self.cap_pointer().get_value::<u128>()
+  }
+  pub fn set_cap(&self, v: u128) {
+    self.cap_pointer().set_value::<u128>(if v == 0 { u128::MAX } else { v })
+  }
 }
 
 impl AlkaneResponder for MintableAlkane {
@@ -31,6 +40,7 @@ impl AlkaneResponder for MintableAlkane {
         match shift(&mut inputs).unwrap() {
           0 => {
             let token_units = shift(&mut inputs).unwrap(); 
+            self.set_cap(shift(&mut inputs).unwrap()); // use 0 for an unlimited supply
             self.set_name_and_symbol(shift(&mut inputs).unwrap(), shift(&mut inputs).unwrap());
             response.alkanes.0.push(self.mint(&context, token_units).unwrap());
             response
