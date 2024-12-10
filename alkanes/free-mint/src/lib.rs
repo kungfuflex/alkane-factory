@@ -47,6 +47,9 @@ impl AlkaneResponder for MintableAlkane {
           }
           77 => {
             response.alkanes.0.push(self.mint(&context, self.value_per_mint()).unwrap());
+            if self.total_supply() > self.cap() {
+              panic!("supply has reached cap");
+            }
             response
           }
           99 => {
