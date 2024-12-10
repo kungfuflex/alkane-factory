@@ -1,53 +1,18 @@
-use alkanes_runtime::{auth::AuthenticatedResponder, token::Token};
+use alkanes_runtime::{auth::AuthenticatedResponder};
 #[allow(unused_imports)]
 use alkanes_runtime::{
     println,
     stdio::{stdout, Write},
 };
-use alkanes_runtime::{runtime::AlkaneResponder, storage::StoragePointer};
+use alkanes_runtime::{runtime::AlkaneResponder};
 use alkanes_support::utils::shift;
-use alkanes_support::{context::Context, parcel::AlkaneTransfer, response::CallResponse};
+use alkanes_support::{parcel::AlkaneTransfer, response::CallResponse};
 use metashrew_support::compat::{to_arraybuffer_layout, to_ptr};
-use metashrew_support::index_pointer::KeyValuePointer;
-use std::sync::Arc;
+
+use alkane_factory_support::factory::{MintableToken};
 
 #[derive(Default)]
 pub struct OwnedToken(());
-
-pub trait MintableToken: Token {
-    fn mint(&self, context: &Context, value: u128) -> AlkaneTransfer {
-        AlkaneTransfer {
-            id: context.myself.clone(),
-            value,
-        }
-    }
-}
-
-impl Token for OwnedToken {
-    fn name(&self) -> String {
-      String::from_utf8(name_pointer().get().as_ref().clone()).expect("name not saved as utf-8, did this deployment revert?")
-    }
-    fn symbol(&self) -> String {
-      String::from_utf8(symbol_pointer().get().as_ref().clone()).expect("symbol not saved as utf-8, did this deployment revert?")
-    }
-}
-
-fn trim(v: u128) -> String {
-  String::from_utf8(v.to_le_bytes().into_iter().fold(Vec::<u8>::new(), |mut r, v| {
-    if v != 0 {
-      r.push(v)
-    }
-    r
-  })).unwrap()
-}
-
-fn name_pointer() -> StoragePointer {
-  StoragePointer::from_keyword("/name")
-}
-
-fn symbol_pointer() -> StoragePointer {
-  StoragePointer::from_keyword("/symbol")
-}
 
 impl MintableToken for OwnedToken {}
 
@@ -60,31 +25,24 @@ impl AlkaneResponder for OwnedToken {
         let mut response: CallResponse = CallResponse::forward(&context.incoming_alkanes.clone());
         match shift(&mut inputs).unwrap() {
             0 => {
-                let mut pointer = StoragePointer::from_keyword("/initialized");
-                if pointer.get().len() == 0 {
-                    let auth_token_units = shift(&mut inputs).unwrap();
-                    let token_units = shift(&mut inputs).unwrap();
-                    name_pointer().set(Arc::<Vec<u8>>::new(trim(shift(&mut inputs).unwrap()).as_bytes().to_vec()));
-                    symbol_pointer().set(Arc::<Vec<u8>>::new(trim(shift(&mut inputs).unwrap()).as_bytes().to_vec()));
-                    response
-                        .alkanes
-                        .0
-                        .push(self.deploy_auth_token(auth_token_units).unwrap());
-                    response.alkanes.0.push(AlkaneTransfer {
-                        id: context.myself.clone(),
-                        value: token_units,
-                    });
-
-                    pointer.set(Arc::new(vec![0x01]));
-                    response
-                } else {
-                    panic!("already initialized");
-                }
+                self.observe_initialization().unwrap();
+                let auth_token_units = shift(&mut inputs).unwrap();
+                let token_units = shift(&mut inputs).unwrap();
+                self.set_name_and_symbol(shift(&mut inputs).unwrap(), shift(&mut inputs).unwrap());
+                response
+                  .alkanes
+                  .0
+                  .push(self.deploy_auth_token(auth_token_units).unwrap());
+                response.alkanes.0.push(AlkaneTransfer {
+                  id: context.myself.clone(),
+                  value: token_units,
+                });
+                response
             }
-            1 => {
+            77 => {
                 self.only_owner().unwrap();
                 let token_units = shift(&mut inputs).unwrap();
-                let transfer = self.mint(&context, token_units);
+                let transfer = self.mint(&context, token_units).unwrap();
                 response.alkanes.0.push(transfer);
                 response
             }
@@ -94,6 +52,10 @@ impl AlkaneResponder for OwnedToken {
             }
             100 => {
                 response.data = self.symbol().into_bytes().to_vec();
+                response
+            }
+            101 => {
+                response.data = self.total_supply().to_le_bytes().to_vec();
                 response
             }
             _ => {
