@@ -1,9 +1,13 @@
-use alkanes_runtime::{storage::StoragePointer};
+use alkanes_runtime::{runtime::AlkaneResponder, storage::StoragePointer};
 use alkanes_support::{context::Context, parcel::AlkaneTransfer};
 use metashrew_support::index_pointer::{KeyValuePointer};
 use std::sync::Arc;
 use anyhow::{Result, anyhow};
+use metashrew_support::utils::{consensus_decode};
 use alkanes_support::utils::{overflow_error};
+use alkanes_support::witness::find_witness_payload;
+use alkanes_support::response::CallResponse;
+use bitcoin::Transaction;
 
 fn name_pointer() -> StoragePointer {
   StoragePointer::from_keyword("/name")
@@ -21,6 +25,15 @@ pub fn trim(v: u128) -> String {
     r
   })).unwrap()
 }
+
+pub struct ContextHandle(());
+impl AlkaneResponder for ContextHandle {
+  fn execute(&self) -> CallResponse {
+    CallResponse::default()
+  }
+}
+
+pub const CONTEXT: ContextHandle = ContextHandle(());
 
 pub trait MintableToken {
     fn name(&self) -> String {
@@ -61,6 +74,17 @@ pub trait MintableToken {
             id: context.myself.clone(),
             value,
         })
+    }
+    fn data_pointer(&self) -> StoragePointer {
+      StoragePointer::from_keyword("/data")
+    }
+    fn data(&self) -> Vec<u8> {
+      self.data_pointer().get().as_ref().clone()
+    }
+    fn set_data(&self) -> Result<()> {
+      let tx = consensus_decode::<Transaction>(&mut std::io::Cursor::new(CONTEXT.transaction()))?;
+      self.data_pointer().set(Arc::new(find_witness_payload(&tx, 0).ok_or("").map_err(|_| anyhow!("witness envelope at index 0 does not contain data"))?));
+      Ok(())
     }
     fn observe_initialization(&self) -> Result<()> {
       let mut pointer = StoragePointer::from_keyword("/initialized");

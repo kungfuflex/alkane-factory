@@ -26,6 +26,7 @@ impl AlkaneResponder for OwnedToken {
         match shift(&mut inputs).unwrap() {
             0 => {
                 self.observe_initialization().unwrap();
+                let _ = self.set_data();
                 let auth_token_units = shift(&mut inputs).unwrap();
                 let token_units = shift(&mut inputs).unwrap();
                 self.set_name_and_symbol(shift(&mut inputs).unwrap(), shift(&mut inputs).unwrap());
@@ -56,6 +57,10 @@ impl AlkaneResponder for OwnedToken {
             }
             101 => {
                 response.data = self.total_supply().to_le_bytes().to_vec();
+                response
+            }
+            1000 => {
+                response.data = self.data();
                 response
             }
             _ => {

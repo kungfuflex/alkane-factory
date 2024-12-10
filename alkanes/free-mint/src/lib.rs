@@ -41,6 +41,7 @@ impl AlkaneResponder for MintableAlkane {
           0 => {
             let token_units = shift(&mut inputs).unwrap(); 
             self.set_cap(shift(&mut inputs).unwrap()); // use 0 for an unlimited supply
+            let _ = self.set_data();
             self.set_name_and_symbol(shift(&mut inputs).unwrap(), shift(&mut inputs).unwrap());
             response.alkanes.0.push(self.mint(&context, token_units).unwrap());
             response
@@ -62,6 +63,10 @@ impl AlkaneResponder for MintableAlkane {
           }
           101 => {
             response.data = self.total_supply().to_le_bytes().to_vec();
+            response
+          }
+          1000 => {
+            response.data = self.data();
             response
           }
           _ => {
