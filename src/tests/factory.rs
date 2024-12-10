@@ -27,9 +27,7 @@ use alkane_helpers::{clear};
 use std::fmt::Write;
 use wasm_bindgen_test::wasm_bindgen_test;
 
-pub const TEST_MULTISIG: &'static str = "bcrt1pys2f8u8yx7nu08txn9kzrstrmlmpvfprdazz9se5qr5rgtuz8htsaz3chd";
-pub const ADDRESS1: &'static str = "bcrt1qzr9vhs60g6qlmk7x3dd7g3ja30wyts48sxuemv";
-
+/*
 fn pay_to_musig(inputs: Vec<OutPoint>, amount: u64) -> Transaction {
   let protostone: Protostone = Protostone {
     burn: None,
@@ -133,9 +131,10 @@ fn set_signer(inputs: Vec<OutPoint>) -> Transaction {
     ]
   }
 }
+*/
 
 #[wasm_bindgen_test]
-fn test_synthetic_init() -> Result<()> {
+fn test_factory() -> Result<()> {
     clear();
     let mut block_height = 850_000;
     let cellpacks: Vec<Cellpack> = [

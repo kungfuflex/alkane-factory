@@ -1,9 +1,9 @@
 [package]
-name = "frbtc-support"
+name = "alkane-factory-support"
 version = "0.1.0"
 edition = "2021"
-description = "frBTC support library"
-repository = "https://github.com/subfrost/frBTC"
+description = "alkane factory support library"
+repository = "https://github.com/kungfuflex/alkane-factory"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
