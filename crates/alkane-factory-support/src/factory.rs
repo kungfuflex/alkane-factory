@@ -28,8 +28,8 @@ pub fn trim(v: u128) -> String {
 
 pub struct ContextHandle(());
 impl AlkaneResponder for ContextHandle {
-  fn execute(&self) -> CallResponse {
-    CallResponse::default()
+  fn execute(&self) -> Result<CallResponse> {
+    Ok(CallResponse::default())
   }
 }
 

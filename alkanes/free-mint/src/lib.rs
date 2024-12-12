@@ -1,6 +1,7 @@
 use alkane_factory_support::factory::{MintableToken};
+use anyhow::{anyhow, Result};
 use alkanes_runtime::runtime::AlkaneResponder;
-use alkanes_support::{response::CallResponse, utils::shift};
+use alkanes_support::{response::CallResponse, utils::shift_or_err};
 use alkanes_runtime::storage::{StoragePointer};
 use metashrew_support::index_pointer::{KeyValuePointer};
 use metashrew_support::compat::{to_arraybuffer_layout, to_ptr};
@@ -33,44 +34,46 @@ impl MintableAlkane {
 }
 
 impl AlkaneResponder for MintableAlkane {
-    fn execute(&self) -> CallResponse {
+    fn execute(&self) -> Result<CallResponse> {
         let context = self.context().unwrap();
         let mut inputs = context.inputs.clone();
         let mut response = CallResponse::forward(&context.incoming_alkanes);
-        match shift(&mut inputs).unwrap() {
+        match shift_or_err(&mut inputs)? {
           0 => {
-            let token_units = shift(&mut inputs).unwrap(); 
-            self.set_cap(shift(&mut inputs).unwrap()); // use 0 for an unlimited supply
+            let token_units = shift_or_err(&mut inputs)?;
+            self.set_value_per_mint(shift_or_err(&mut inputs)?);
+            self.set_cap(shift_or_err(&mut inputs)?); // use 0 for an unlimited supply
             let _ = self.set_data();
-            self.set_name_and_symbol(shift(&mut inputs).unwrap(), shift(&mut inputs).unwrap());
+            self.set_name_and_symbol(shift_or_err(&mut inputs)?, shift_or_err(&mut inputs)?);
             response.alkanes.0.push(self.mint(&context, token_units).unwrap());
-            response
+            Ok(response)
           }
           77 => {
             response.alkanes.0.push(self.mint(&context, self.value_per_mint()).unwrap());
             if self.total_supply() > self.cap() {
-              panic!("supply has reached cap");
+              Err(anyhow!("supply has reached cap"))
+            } else {
+              Ok(response)
             }
-            response
           }
           99 => {
             response.data = self.name().into_bytes().to_vec();
-            response
+            Ok(response)
           }
           100 => {
             response.data = self.symbol().into_bytes().to_vec();
-            response
+            Ok(response)
           }
           101 => {
             response.data = self.total_supply().to_le_bytes().to_vec();
-            response
+            Ok(response)
           }
           1000 => {
             response.data = self.data();
-            response
+            Ok(response)
           }
           _ => {
-            panic!("unrecognized opcode");
+            Err(anyhow!("unrecognized opcode"))
           }
         }
     }
