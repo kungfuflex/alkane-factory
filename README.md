@@ -1,4 +1,8 @@
-# frBTC
+# alkane-factory
+
+Templates for alkanes that are meant to be factory instantiated with an attached witness envelope for content.
+
+Tokens adhere to the alkane token format for fully qualified tokens, with name(), symbol(), and data().
 
 
 ## Build
