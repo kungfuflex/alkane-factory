@@ -87,6 +87,10 @@ impl AlkaneResponder for MintableAlkane {
             response.data = self.cap().to_le_bytes().to_vec();
             Ok(response)
           }
+          103 => {
+            response.data = self.minted().to_le_bytes().to_vec();
+            Ok(response)
+          }
           1000 => {
             response.data = self.data();
             Ok(response)
