@@ -2,6 +2,7 @@ use alkane_factory_support::factory::{MintableToken};
 use anyhow::{anyhow, Result};
 use alkanes_runtime::runtime::AlkaneResponder;
 use alkanes_support::{response::CallResponse, utils::shift_or_err};
+use alkanes_support::utils::{overflow_error};
 use alkanes_runtime::storage::{StoragePointer};
 use metashrew_support::index_pointer::{KeyValuePointer};
 use metashrew_support::compat::{to_arraybuffer_layout, to_ptr};
@@ -13,6 +14,19 @@ pub struct MintableAlkane(());
 impl MintableToken for MintableAlkane {}
 
 impl MintableAlkane {
+  pub fn minted_pointer(&self) -> StoragePointer {
+    StoragePointer::from_keyword("/minted")
+  }
+  pub fn minted(&self) -> u128 {
+    self.minted_pointer().get_value::<u128>()
+  }
+  pub fn set_minted(&self, v: u128) {
+    self.minted_pointer().set_value::<u128>(v);
+  }
+  pub fn increment_mint(&self) -> Result<()> {
+    self.set_minted(overflow_error(self.minted().checked_add(1u128))?);
+    Ok(())
+  }
   pub fn value_per_mint_pointer(&self) -> StoragePointer {
     StoragePointer::from_keyword("/value-per-mint")
   }
@@ -50,7 +64,8 @@ impl AlkaneResponder for MintableAlkane {
           }
           77 => {
             response.alkanes.0.push(self.mint(&context, self.value_per_mint()).unwrap());
-            if self.total_supply() > self.cap() {
+            self.increment_mint()?;
+            if self.minted() > self.cap() {
               Err(anyhow!("supply has reached cap"))
             } else {
               Ok(response)
@@ -66,6 +81,10 @@ impl AlkaneResponder for MintableAlkane {
           }
           101 => {
             response.data = self.total_supply().to_le_bytes().to_vec();
+            Ok(response)
+          }
+          102 => {
+            response.data = self.cap().to_le_bytes().to_vec();
             Ok(response)
           }
           1000 => {
