@@ -4,6 +4,11 @@ use alkanes_runtime::runtime::AlkaneResponder;
 use alkanes_support::{response::CallResponse, utils::shift_or_err};
 use alkanes_support::utils::{overflow_error};
 use alkanes_runtime::storage::{StoragePointer};
+#[allow(unused_imports)]
+use {
+  alkanes_runtime::{println, stdio::{stdout}},
+  std::fmt::{Write}
+};
 use metashrew_support::index_pointer::{KeyValuePointer};
 use metashrew_support::compat::{to_arraybuffer_layout, to_ptr};
 
@@ -57,7 +62,7 @@ impl AlkaneResponder for MintableAlkane {
             let token_units = shift_or_err(&mut inputs)?;
             self.set_value_per_mint(shift_or_err(&mut inputs)?);
             self.set_cap(shift_or_err(&mut inputs)?); // use 0 for an unlimited supply
-            let _ = self.set_data();
+            self.set_data()?;
             self.set_name_and_symbol(shift_or_err(&mut inputs)?, shift_or_err(&mut inputs)?);
             response.alkanes.0.push(self.mint(&context, token_units).unwrap());
             Ok(response)
