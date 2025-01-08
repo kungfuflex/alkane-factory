@@ -23,7 +23,6 @@ use std::sync::Arc;
 #[derive(Default)]
 struct MerkleDistributor(());
 
-
 pub fn overflow_error(v: Option<u128>) -> Result<u128> {
     v.ok_or("").map_err(|_| anyhow!("overflow error"))
 }
@@ -48,11 +47,10 @@ impl MerkleDistributor {
             if pointer as usize >= tx.output.len() {
                 panic!("pointer cannot be a protomessage");
             }
-            let mut cursor: Cursor<Vec<u8>> = Cursor::<Vec<u8>>::new(
-                find_witness_payload(&tx, 0)
-                    .ok_or("")
-                    .map_err(|_| anyhow!("witness envelope at index 0 does not contain data"))?,
-            );
+            let mut cursor: Cursor<Vec<u8>> =
+                Cursor::<Vec<u8>>::new(find_witness_payload(&tx, 0).ok_or_else(|| {
+                    anyhow!("alkanes-factory: witness envelope at index 0 does not contain data")
+                })?);
             let leaf = consume_exact(&mut cursor, 40)?;
             let leaf_hash = Sha256::hash(&leaf);
             let proof = consume_to_end(&mut cursor)?;
