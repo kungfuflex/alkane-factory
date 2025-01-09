@@ -58,12 +58,9 @@ fn test_factory() -> Result<()> {
         },
     ]
     .into();
-    let mut test_block = alkane_helpers::init_with_multiple_cellpacks_with_tx(
-        [
-            free_mint_build::get_bytes(),
-            compress(vec![0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])?,
-        ]
-        .into(),
+    let returnable_data = vec![0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07];
+    let test_block = alkane_helpers::init_with_multiple_cellpacks_with_tx(
+        [free_mint_build::get_bytes(), returnable_data.clone()].into(),
         cellpacks,
     );
     let len = test_block.txdata.len();
@@ -92,6 +89,9 @@ fn test_factory() -> Result<()> {
     })
     .encipher();
     println!("calldata: {:?}", &parcel.calldata);
-    println!("{:?}", view::simulate_parcel(&parcel, u64::MAX)?.0);
+    let callresponse_data = view::simulate_parcel(&parcel, u64::MAX)?.0.data;
+    println!("{:?}", callresponse_data);
+    println!("gzipped: {:?}", returnable_data);
+    assert!(callresponse_data == returnable_data);
     Ok(())
 }

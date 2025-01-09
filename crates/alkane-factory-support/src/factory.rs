@@ -4,11 +4,12 @@ use alkanes_runtime::{
     stdio::{stdout, Write},
     storage::StoragePointer,
 };
-use alkanes_support::envelope::RawEnvelope;
+use alkanes_support::gz::decompress;
 use alkanes_support::response::CallResponse;
 use alkanes_support::utils::overflow_error;
 use alkanes_support::witness::find_witness_payload;
 use alkanes_support::{context::Context, parcel::AlkaneTransfer};
+use alkanes_support::{envelope::RawEnvelope, gz};
 use anyhow::{anyhow, Result};
 use bitcoin::Transaction;
 use metashrew_support::index_pointer::KeyValuePointer;
@@ -97,14 +98,10 @@ pub trait MintableToken {
     fn set_data(&self) -> Result<()> {
         let tx = consensus_decode::<Transaction>(&mut std::io::Cursor::new(CONTEXT.transaction()))?;
         println!("finding witness payload");
-        let envelops = RawEnvelope::from_transaction(&tx);
-        println!("{}", envelops.len());
-        self.data_pointer()
-            .set(Arc::new(find_witness_payload(&tx, 0).ok_or_else(|| {
-                anyhow!(
-                    "alkanes-factory-support: witness envelope at index 0 does not contain data"
-                )
-            })?));
+        let data = gz::decompress(find_witness_payload(&tx, 0).ok_or_else(|| {
+            anyhow!("alkanes-factory-support: witness envelope at index 0 does not contain data")
+        })?)?;
+        self.data_pointer().set(Arc::new(data));
         Ok(())
     }
     fn observe_initialization(&self) -> Result<()> {
