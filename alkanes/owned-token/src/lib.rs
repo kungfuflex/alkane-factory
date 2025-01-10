@@ -1,16 +1,16 @@
-use alkanes_runtime::{auth::AuthenticatedResponder};
+use alkanes_runtime::auth::AuthenticatedResponder;
+use alkanes_runtime::runtime::AlkaneResponder;
 #[allow(unused_imports)]
 use alkanes_runtime::{
     println,
     stdio::{stdout, Write},
 };
-use alkanes_runtime::{runtime::AlkaneResponder};
-use anyhow::{anyhow, Result};
 use alkanes_support::utils::shift_or_err;
 use alkanes_support::{parcel::AlkaneTransfer, response::CallResponse};
+use anyhow::{anyhow, Result};
 use metashrew_support::compat::{to_arraybuffer_layout, to_ptr};
 
-use alkane_factory_support::factory::{MintableToken};
+use alkane_factory_support::factory::MintableToken;
 
 #[derive(Default)]
 pub struct OwnedToken(());
@@ -27,17 +27,18 @@ impl AlkaneResponder for OwnedToken {
         match shift_or_err(&mut inputs)? {
             0 => {
                 self.observe_initialization()?;
+                println!("owned token initializing");
                 let _ = self.set_data();
                 let auth_token_units = shift_or_err(&mut inputs)?;
                 let token_units = shift_or_err(&mut inputs)?;
                 self.set_name_and_symbol(shift_or_err(&mut inputs)?, shift_or_err(&mut inputs)?);
                 response
-                  .alkanes
-                  .0
-                  .push(self.deploy_auth_token(auth_token_units)?);
+                    .alkanes
+                    .0
+                    .push(self.deploy_auth_token(auth_token_units)?);
                 response.alkanes.0.push(AlkaneTransfer {
-                  id: context.myself.clone(),
-                  value: token_units,
+                    id: context.myself.clone(),
+                    value: token_units,
                 });
                 Ok(response)
             }
@@ -64,9 +65,7 @@ impl AlkaneResponder for OwnedToken {
                 response.data = self.data();
                 Ok(response)
             }
-            _ => {
-                Err(anyhow!("unrecognized opcode"))
-            }
+            _ => Err(anyhow!("unrecognized opcode")),
         }
     }
 }
