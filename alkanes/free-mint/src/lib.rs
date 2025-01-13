@@ -2,15 +2,12 @@ use alkane_factory_support::factory::MintableToken;
 use alkanes_runtime::runtime::AlkaneResponder;
 use alkanes_runtime::storage::StoragePointer;
 use alkanes_support::utils::overflow_error;
-use alkanes_support::{response::CallResponse, utils::shift_or_err};
-use anyhow::{anyhow, Result};
-use metashrew_support::compat::{to_arraybuffer_layout, to_ptr};
+use alkanes_support::{ response::CallResponse, utils::shift_or_err };
+use anyhow::{ anyhow, Result };
+use metashrew_support::compat::{ to_arraybuffer_layout, to_ptr };
 use metashrew_support::index_pointer::KeyValuePointer;
 #[allow(unused_imports)]
-use {
-    alkanes_runtime::{println, stdio::stdout},
-    std::fmt::Write,
-};
+use ::{ alkanes_runtime::{ println, stdio::stdout }, std::fmt::Write };
 
 #[derive(Default)]
 pub struct MintableAlkane(());
@@ -47,8 +44,7 @@ impl MintableAlkane {
         self.cap_pointer().get_value::<u128>()
     }
     pub fn set_cap(&self, v: u128) {
-        self.cap_pointer()
-            .set_value::<u128>(if v == 0 { u128::MAX } else { v })
+        self.cap_pointer().set_value::<u128>(if v == 0 { u128::MAX } else { v })
     }
 }
 
@@ -62,20 +58,13 @@ impl AlkaneResponder for MintableAlkane {
                 let token_units = shift_or_err(&mut inputs)?;
                 self.set_value_per_mint(shift_or_err(&mut inputs)?);
                 self.set_cap(shift_or_err(&mut inputs)?); // use 0 for an unlimited supply
-                println!("free mint initializing");
                 self.set_data()?;
                 self.set_name_and_symbol(shift_or_err(&mut inputs)?, shift_or_err(&mut inputs)?);
-                response
-                    .alkanes
-                    .0
-                    .push(self.mint(&context, token_units).unwrap());
+                response.alkanes.0.push(self.mint(&context, token_units).unwrap());
                 Ok(response)
             }
             77 => {
-                response
-                    .alkanes
-                    .0
-                    .push(self.mint(&context, self.value_per_mint()).unwrap());
+                response.alkanes.0.push(self.mint(&context, self.value_per_mint()).unwrap());
                 self.increment_mint()?;
                 if self.minted() > self.cap() {
                     Err(anyhow!("supply has reached cap"))
@@ -103,11 +92,15 @@ impl AlkaneResponder for MintableAlkane {
                 response.data = self.minted().to_le_bytes().to_vec();
                 Ok(response)
             }
+            104 => {
+                response.data = self.value_per_mint().to_le_bytes().to_vec();
+                Ok(response)
+            }
             1000 => {
                 response.data = self.data();
                 Ok(response)
             }
-            _ => Err(anyhow!("unrecognized opcode")),
+            _ => { Err(anyhow!("unrecognized opcode")) }
         }
     }
 }
