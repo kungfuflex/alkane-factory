@@ -1,10 +1,10 @@
 use alkane_factory_support::factory::MintableToken;
-use alkanes_runtime::runtime::AlkaneResponder;
+use alkanes_runtime::{declare_alkane, runtime::AlkaneResponder};
 use alkanes_runtime::storage::StoragePointer;
 use alkanes_support::utils::overflow_error;
 use alkanes_support::{ response::CallResponse, utils::shift_or_err };
 use anyhow::{ anyhow, Result };
-use metashrew_support::compat::{ to_arraybuffer_layout, to_ptr };
+use metashrew_support::compat::{ to_arraybuffer_layout, to_passback_ptr };
 use metashrew_support::index_pointer::KeyValuePointer;
 #[allow(unused_imports)]
 use ::{ alkanes_runtime::{ println, stdio::stdout }, std::fmt::Write };
@@ -105,8 +105,5 @@ impl AlkaneResponder for MintableAlkane {
     }
 }
 
-#[no_mangle]
-pub extern "C" fn __execute() -> i32 {
-    let mut response = to_arraybuffer_layout(&MintableAlkane::default().run());
-    to_ptr(&mut response) + 4
-}
+declare_alkane!{ MintableAlkane }
+

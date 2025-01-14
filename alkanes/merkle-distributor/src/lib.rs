@@ -1,4 +1,4 @@
-use alkanes_runtime::runtime::AlkaneResponder;
+use alkanes_runtime::{declare_alkane, runtime::AlkaneResponder};
 use alkanes_runtime::storage::StoragePointer;
 use alkanes_support::{
     id::AlkaneId,
@@ -11,7 +11,7 @@ use anyhow::{anyhow, Result};
 use bitcoin::Transaction;
 use metashrew_support::index_pointer::KeyValuePointer;
 use metashrew_support::{
-    compat::{to_arraybuffer_layout, to_ptr},
+    compat::{to_arraybuffer_layout, to_passback_ptr},
     utils::{consume_exact, consume_sized_int, consume_to_end},
 };
 use ordinals::{Artifact, Runestone};
@@ -148,8 +148,4 @@ impl AlkaneResponder for MerkleDistributor {
     }
 }
 
-#[no_mangle]
-pub extern "C" fn __execute() -> i32 {
-    let mut response = to_arraybuffer_layout(&MerkleDistributor::default().run());
-    to_ptr(&mut response) + 4
-}
+declare_alkane!{ MerkleDistributor }

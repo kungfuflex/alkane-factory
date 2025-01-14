@@ -1,11 +1,12 @@
 use alkanes_runtime::auth::AuthenticatedResponder;
-use alkanes_runtime::runtime::AlkaneResponder;
+use alkanes_runtime::{declare_alkane, runtime::AlkaneResponder};
 #[allow(unused_imports)]
 use alkanes_runtime::{
     println,
     stdio::{stdout, Write},
 };
 use alkanes_support::utils::shift_or_err;
+use metashrew_support::compat::{to_passback_ptr};
 use alkanes_support::{parcel::AlkaneTransfer, response::CallResponse};
 use anyhow::{anyhow, Result};
 use metashrew_support::compat::{to_arraybuffer_layout, to_ptr};
@@ -70,8 +71,4 @@ impl AlkaneResponder for OwnedToken {
     }
 }
 
-#[no_mangle]
-pub extern "C" fn __execute() -> i32 {
-    let mut response = to_arraybuffer_layout(&OwnedToken::default().run());
-    to_ptr(&mut response) + 4
-}
+declare_alkane!{ OwnedToken }
