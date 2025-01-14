@@ -50,7 +50,7 @@ impl MintableAlkane {
 
 impl AlkaneResponder for MintableAlkane {
     fn execute(&self) -> Result<CallResponse> {
-        let context = self.context().unwrap();
+        let context = self.context()?;
         let mut inputs = context.inputs.clone();
         let mut response = CallResponse::forward(&context.incoming_alkanes);
         match shift_or_err(&mut inputs)? {
@@ -60,11 +60,11 @@ impl AlkaneResponder for MintableAlkane {
                 self.set_cap(shift_or_err(&mut inputs)?); // use 0 for an unlimited supply
                 self.set_data()?;
                 self.set_name_and_symbol(shift_or_err(&mut inputs)?, shift_or_err(&mut inputs)?);
-                response.alkanes.0.push(self.mint(&context, token_units).unwrap());
+                response.alkanes.0.push(self.mint(&context, token_units)?);
                 Ok(response)
             }
             77 => {
-                response.alkanes.0.push(self.mint(&context, self.value_per_mint()).unwrap());
+                response.alkanes.0.push(self.mint(&context, self.value_per_mint())?);
                 self.increment_mint()?;
                 if self.minted() > self.cap() {
                     Err(anyhow!("supply has reached cap"))
