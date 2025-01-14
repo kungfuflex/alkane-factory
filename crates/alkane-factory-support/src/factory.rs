@@ -93,14 +93,12 @@ pub trait MintableToken {
         StoragePointer::from_keyword("/data")
     }
     fn data(&self) -> Vec<u8> {
-        self.data_pointer().get().as_ref().clone()
+        gz::decompress(self.data_pointer().get().as_ref().clone()).unwrap_or_else(|_| vec![])
     }
     fn set_data(&self) -> Result<()> {
         let tx = consensus_decode::<Transaction>(&mut std::io::Cursor::new(CONTEXT.transaction()))?;
         println!("finding witness payload");
-        let data = gz::decompress(find_witness_payload(&tx, 0).ok_or_else(|| {
-            anyhow!("alkanes-factory-support: witness envelope at index 0 does not contain data")
-        })?)?;
+        let data: Vec<u8> = find_witness_payload(&tx, 0).unwrap_or_else(|| vec![]);
         self.data_pointer().set(Arc::new(data));
         Ok(())
     }
