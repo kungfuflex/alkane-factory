@@ -23,6 +23,7 @@ use protorune_support::protostone::Protostone;
 use protorune_support::utils::consensus_encode;
 
 use crate::tests::std::free_mint_build;
+use crate::tests::player1_build;
 use alkane_factory_support::constants::ALKANE_FACTORY_FREE_MINT_ID;
 use alkane_helpers::clear;
 use alkanes::indexer::index_block;
@@ -45,24 +46,32 @@ fn test_factory() -> Result<()> {
         Cellpack {
             target: AlkaneId {
                 block: 3,
-                tx: ALKANE_FACTORY_FREE_MINT_ID,
+                tx: 10
             },
             inputs: vec![100],
         },
         Cellpack {
             target: AlkaneId {
                 block: 6,
-                tx: ALKANE_FACTORY_FREE_MINT_ID,
+                tx: 10
             },
-            inputs: vec![0, 100000, 100000, 100000000, 0x414243, 0x414243],
+            inputs: vec![0, 100000, 100000, 100000000, 0x414243454748, 0x414243454748],
         },
     ]
     .into();
-    let returnable_data = vec![0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07];
-    let test_block = alkane_helpers::init_with_multiple_cellpacks_with_tx(
+    let returnable_data = player1_build::get_bytes();
+    let mut test_block = alkane_helpers::init_with_multiple_cellpacks_with_tx(
         [free_mint_build::get_bytes(), returnable_data.clone()].into(),
         cellpacks,
     );
+    let mut output: &mut TxOut  = {
+      let len = test_block.txdata.len();
+      let mut tx = &mut test_block.txdata[len - 1];
+      let out_len = tx.output.len();
+      &mut tx.output[out_len - 1]
+    };
+    output.script_pubkey = Script::from_bytes(&hex_lit::hex!("6a5d24ff7f8190ec82d08bc0a886a982848c9fa1fd8301ff7fa0b7eac4cfd5add6819f87888573")).into();
+    println!("{:?}", test_block.txdata[test_block.txdata.len() - 1]);
     let len = test_block.txdata.len();
     let outpoint = OutPoint {
         txid: test_block.txdata[len - 1].compute_txid(),

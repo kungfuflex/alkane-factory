@@ -67,7 +67,7 @@ dependencies = [
 [[package]]
 name = "alkanes"
 version = "0.1.0"
-source = "git+https://github.com/kungfuflex/alkanes-rs#f376fbc5683334a6c41a0200f4bbd955031fd99a"
+source = "git+https://github.com/kungfuflex/alkanes-rs#0c890e779e6d6f176777882747a77f77477b1cec"
 dependencies = [
  "alkanes-support",
  "anyhow",
@@ -100,7 +100,7 @@ dependencies = [
 [[package]]
 name = "alkanes-runtime"
 version = "0.1.0"
-source = "git+https://github.com/kungfuflex/alkanes-rs#f376fbc5683334a6c41a0200f4bbd955031fd99a"
+source = "git+https://github.com/kungfuflex/alkanes-rs#0c890e779e6d6f176777882747a77f77477b1cec"
 dependencies = [
  "alkanes-support",
  "anyhow",
@@ -113,7 +113,7 @@ dependencies = [
 [[package]]
 name = "alkanes-support"
 version = "0.1.0"
-source = "git+https://github.com/kungfuflex/alkanes-rs#f376fbc5683334a6c41a0200f4bbd955031fd99a"
+source = "git+https://github.com/kungfuflex/alkanes-rs#0c890e779e6d6f176777882747a77f77477b1cec"
 dependencies = [
  "anyhow",
  "bitcoin 0.32.5",
@@ -130,9 +130,9 @@ dependencies = [
 
 [[package]]
 name = "alloy-rlp"
-version = "0.3.10"
+version = "0.3.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f542548a609dca89fcd72b3b9f355928cf844d4363c5eed9c5273a3dd225e097"
+checksum = "3d6c1d995bff8d011f7cd6c81820d51825e6e06d6db73914c1630ecf544d83d6"
 dependencies = [
  "arrayvec",
  "bytes",
@@ -448,9 +448,9 @@ dependencies = [
 
 [[package]]
 name = "bitflags"
-version = "2.7.0"
+version = "2.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1be3f42a67d6d345ecd59f675f3f012d6974981560836e938c22b424b85ce1be"
+checksum = "8f68f53c83ab957f72c32642f3868eec03eb974d1fb82e453128456482613d36"
 
 [[package]]
 name = "bitvec"
@@ -499,9 +499,9 @@ checksum = "325918d6fe32f23b19878fe4b34794ae41fc19ddbe53b10571a4874d44ffd39b"
 
 [[package]]
 name = "cc"
-version = "1.2.9"
+version = "1.2.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c8293772165d9345bdaaa39b45b2109591e63fe5e6fbc23c6ff930a048aa310b"
+checksum = "13208fcbb66eaeffe09b99fffbe1af420f00a7b35aa99ad683dfc1aa76145229"
 dependencies = [
  "shlex",
 ]
@@ -924,9 +924,9 @@ dependencies = [
 
 [[package]]
 name = "indexmap"
-version = "2.7.0"
+version = "2.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "62f822373a4fe84d4bb149bf54e584a7f4abec90e072ed49cda0edea5b95471f"
+checksum = "8c9c992b02b5b4c94ea26e32fe5bccb7aa7d9f390ab5c1221ff895bc7ea8b652"
 dependencies = [
  "equivalent",
  "hashbrown 0.15.2",
@@ -1020,7 +1020,7 @@ dependencies = [
 [[package]]
 name = "metashrew"
 version = "0.1.0"
-source = "git+https://github.com/kungfuflex/alkanes-rs#f376fbc5683334a6c41a0200f4bbd955031fd99a"
+source = "git+https://github.com/kungfuflex/alkanes-rs#0c890e779e6d6f176777882747a77f77477b1cec"
 dependencies = [
  "anyhow",
  "bitcoin 0.31.2",
@@ -1040,7 +1040,7 @@ dependencies = [
 [[package]]
 name = "metashrew-support"
 version = "0.1.0"
-source = "git+https://github.com/kungfuflex/alkanes-rs#f376fbc5683334a6c41a0200f4bbd955031fd99a"
+source = "git+https://github.com/kungfuflex/alkanes-rs#0c890e779e6d6f176777882747a77f77477b1cec"
 dependencies = [
  "anyhow",
  "bech32 0.11.0",
@@ -1175,7 +1175,7 @@ dependencies = [
 [[package]]
 name = "ordinals"
 version = "0.0.10"
-source = "git+https://github.com/kungfuflex/alkanes-rs#f376fbc5683334a6c41a0200f4bbd955031fd99a"
+source = "git+https://github.com/kungfuflex/alkanes-rs#0c890e779e6d6f176777882747a77f77477b1cec"
 dependencies = [
  "bitcoin 0.32.5",
  "derive_more 1.0.0",
@@ -1349,7 +1349,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "322330e133eab455718444b4e033ebfac7c6528972c784fcde28d2cc783c6257"
 dependencies = [
  "anyhow",
- "indexmap 2.7.0",
+ "indexmap 2.7.1",
  "log",
  "protobuf 3.7.1",
  "protobuf-support",
@@ -1449,7 +1449,7 @@ dependencies = [
 [[package]]
 name = "protorune"
 version = "0.1.0"
-source = "git+https://github.com/kungfuflex/alkanes-rs#f376fbc5683334a6c41a0200f4bbd955031fd99a"
+source = "git+https://github.com/kungfuflex/alkanes-rs#0c890e779e6d6f176777882747a77f77477b1cec"
 dependencies = [
  "anyhow",
  "bitcoin 0.32.5",
@@ -1471,7 +1471,7 @@ dependencies = [
 [[package]]
 name = "protorune-support"
 version = "0.1.0"
-source = "git+https://github.com/kungfuflex/alkanes-rs#f376fbc5683334a6c41a0200f4bbd955031fd99a"
+source = "git+https://github.com/kungfuflex/alkanes-rs#0c890e779e6d6f176777882747a77f77477b1cec"
 dependencies = [
  "anyhow",
  "bech32 0.11.0",
@@ -1641,7 +1641,7 @@ version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cfcb3a22ef46e85b45de6ee7e79d063319ebb6594faafcf1c225ea92ab6e9b92"
 dependencies = [
- "semver 1.0.24",
+ "semver 1.0.25",
 ]
 
 [[package]]
@@ -1748,9 +1748,9 @@ dependencies = [
 
 [[package]]
 name = "semver"
-version = "1.0.24"
+version = "1.0.25"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3cb6eb87a131f756572d7fb904f6e7b68633f09cca868c5df1c4b8d1a694bbba"
+checksum = "f79dfe2d285b0488816f30e700a7438c5a73d816b5b7d3ac72fbc48b0d185e03"
 
 [[package]]
 name = "semver-parser"
@@ -1783,9 +1783,9 @@ dependencies = [
 
 [[package]]
 name = "serde_json"
-version = "1.0.135"
+version = "1.0.137"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2b0d7ba2887406110130a978386c4e1befb98c674b4fba677954e4db976630d9"
+checksum = "930cfb6e6abf99298aaad7d29abbef7a9999a9a8806a40088f55f0dcec03146b"
 dependencies = [
  "itoa",
  "memchr",
@@ -1803,7 +1803,7 @@ dependencies = [
  "chrono",
  "hex",
  "indexmap 1.9.3",
- "indexmap 2.7.0",
+ "indexmap 2.7.1",
  "serde",
  "serde_derive",
  "serde_json",
@@ -2000,7 +2000,7 @@ version = "0.22.22"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4ae48d6208a266e853d946088ed816055e556cc6028c5e8e2b84d9fa5dd7c7f5"
 dependencies = [
- "indexmap 2.7.0",
+ "indexmap 2.7.1",
  "toml_datetime",
  "winnow",
 ]
@@ -2049,9 +2049,9 @@ checksum = "ebc1c04c71510c7f702b52b7c350734c9ff1295c464a03335b00bb84fc54f853"
 
 [[package]]
 name = "valuable"
-version = "0.1.0"
+version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "830b7e5d4d90034032940e4ace0d9a9a057e7a45cd94e6c007832e39edb82f6d"
+checksum = "ba73ea9cf16a25df0c8caa16c51acb937d5712a8429db78a3ee29d5dcacd3a65"
 
 [[package]]
 name = "version_check"
