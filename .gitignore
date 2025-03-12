@@ -1,2 +1,4 @@
 /target
 src/tests/std
+.DS_Store
+.vscode
