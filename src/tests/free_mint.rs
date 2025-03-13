@@ -21,14 +21,11 @@ use crate::tests::helper::init_factory;
 
 #[wasm_bindgen_test]
 fn test_free_mint_deployment() -> Result<()> {
-    // Clear any previous state and set view mode
     clear();
     set_view_mode();
     
-    // Deploy the free mint contract
     let (block, deployment_ids) = init_factory::init_free_mint_block()?;
     
-    // Index the block to process the contract deployment
     let block_height: u32 = 850_000;
     index_block(&block, block_height)?;
     
@@ -66,21 +63,17 @@ fn test_free_mint_deployment() -> Result<()> {
 
 #[wasm_bindgen_test]
 fn test_free_mint_token_creation() -> Result<()> {
-    // Clear any previous state and set view mode
     clear();
     set_view_mode();
     
-    // Set block height for the test
     let block_height: u32 = 850_000;
     
-    // First deploy the free mint contract
     let (contract_block, deployment_ids) = init_factory::init_free_mint_block()?;
     index_block(&contract_block, block_height)?;
     
-    // Assert the contract was deployed correctly
     init_factory::assert_free_mint_deployed(&deployment_ids)?;
     
-    // Now create a new token using the free mint contract
+    // Now create a new token 
     // Parameters for the new token:
     // - opcode 0 (initialize)
     // - token_units: 1000 (amount per mint)
@@ -105,7 +98,6 @@ fn test_free_mint_token_creation() -> Result<()> {
         token_cellpacks,
     );
     
-    // Index the token creation block
     index_block(&token_block, block_height + 1)?;
     
     // Get the token creation transaction outpoint
@@ -200,28 +192,16 @@ fn test_free_mint_token_creation() -> Result<()> {
 
 #[wasm_bindgen_test]
 fn test_free_mint_token_minting() -> Result<()> {
-    // Clear any previous state and set view mode
     clear();
     set_view_mode();
-    
-    // Set block height for the test
     let block_height: u32 = 850_000;
     
-    // First deploy the free mint contract
     let (contract_block, deployment_ids) = init_factory::init_free_mint_block()?;
     index_block(&contract_block, block_height)?;
     
-    // Assert the contract was deployed correctly
     init_factory::assert_free_mint_deployed(&deployment_ids)?;
     
-    // Now create a new token using the free mint contract
-    // Parameters for the new token:
-    // - opcode 0 (initialize)
-    // - token_units: 1000 (amount per mint)
-    // - value_per_mint: 1000 (value per mint)
-    // - cap: 100 (max supply)
-    // - name: 0x414243 (ASCII: "ABC")
-    // - symbol: 0x58595A (ASCII: "XYZ")
+    // Create a new token
     let token_cellpacks: Vec<Cellpack> = [
         Cellpack {
             target: AlkaneId {
@@ -235,11 +215,10 @@ fn test_free_mint_token_minting() -> Result<()> {
     
     // Create a new block with the token creation transaction
     let token_block = alkane_helpers::init_with_multiple_cellpacks_with_tx(
-        [vec![]].into(), // No new contract code
+        [vec![]].into(), 
         token_cellpacks,
     );
     
-    // Index the token creation block
     index_block(&token_block, block_height + 1)?;
     
     // Get the token creation transaction outpoint
@@ -258,25 +237,24 @@ fn test_free_mint_token_minting() -> Result<()> {
     let mut out = stdout();
     writeln!(out, "Initial token balances: {:?}", token_sheet)?;
     
-    // Now mint a token using opcode 77
+    // Mint a token
     let mint_cellpacks: Vec<Cellpack> = [
         Cellpack {
             target: AlkaneId {
                 block: deployment_ids.free_mint_factory.block,
                 tx: ALKANE_FACTORY_FREE_MINT_ID,
             },
-            inputs: vec![77], // 77 is the opcode to mint
+            inputs: vec![77],
         },
     ]
     .into();
     
     // Create a new block with the mint transaction
     let mint_block = alkane_helpers::init_with_multiple_cellpacks_with_tx(
-        [vec![]].into(), // No new contract code
+        [vec![]].into(), 
         mint_cellpacks,
     );
     
-    // Index the mint block
     index_block(&mint_block, block_height + 2)?;
     
     // Get the mint transaction outpoint
