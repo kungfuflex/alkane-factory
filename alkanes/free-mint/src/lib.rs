@@ -9,6 +9,39 @@ use metashrew_support::index_pointer::KeyValuePointer;
 #[allow(unused_imports)]
 use ::{ alkanes_runtime::{ println, stdio::stdout }, std::fmt::Write };
 
+pub struct TokenDetails {
+    pub name: String,
+    pub symbol: String,
+    pub total_supply: u128,
+    pub cap: u128,
+    pub minted: u128,
+    pub value_per_mint: u128,
+}
+
+impl TokenDetails {
+    pub fn try_to_vec(&self) -> Vec<u8> {
+        let mut bytes = Vec::new();
+        
+        // Add the name
+        let name_bytes = self.name.as_bytes();
+        bytes.extend_from_slice(&(name_bytes.len() as u32).to_le_bytes());
+        bytes.extend_from_slice(name_bytes);
+        
+        // Add the symbol
+        let symbol_bytes = self.symbol.as_bytes();
+        bytes.extend_from_slice(&(symbol_bytes.len() as u32).to_le_bytes());
+        bytes.extend_from_slice(symbol_bytes);
+        
+        // Add numeric values
+        bytes.extend_from_slice(&self.total_supply.to_le_bytes());
+        bytes.extend_from_slice(&self.cap.to_le_bytes());
+        bytes.extend_from_slice(&self.minted.to_le_bytes());
+        bytes.extend_from_slice(&self.value_per_mint.to_le_bytes());
+        
+        bytes
+    }
+}
+
 #[derive(Default)]
 pub struct MintableAlkane(());
 
@@ -45,6 +78,21 @@ impl MintableAlkane {
     }
     pub fn set_cap(&self, v: u128) {
         self.cap_pointer().set_value::<u128>(if v == 0 { u128::MAX } else { v })
+    }
+    pub fn token_details(&self) -> Result<CallResponse> {
+        let details = TokenDetails {
+            name: self.name(),
+            symbol: self.symbol(),
+            total_supply: self.total_supply(),
+            cap: self.cap(),
+            minted: self.minted(),
+            value_per_mint: self.value_per_mint(),
+        };
+        
+        let mut response = CallResponse::default();
+        response.data = details.try_to_vec();
+        
+        Ok(response)
     }
 }
 
@@ -99,6 +147,10 @@ impl AlkaneResponder for MintableAlkane {
             1000 => {
                 response.data = self.data();
                 Ok(response)
+            }
+            999 => {
+                // Return all token details
+                self.token_details()
             }
             _ => { Err(anyhow!("unrecognized opcode")) }
         }
