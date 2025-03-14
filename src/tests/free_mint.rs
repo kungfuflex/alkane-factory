@@ -336,4 +336,113 @@ fn test_free_mint_token_minting() -> Result<()> {
     writeln!(out, "Token successfully minted and verified")?;
     
     Ok(())
-} 
+}
+
+#[wasm_bindgen_test]
+fn test_free_mint_token_details() -> Result<()> {
+    clear();
+    set_view_mode();
+    let block_height: u32 = 850_000;
+    
+    // Initialize the free-mint token
+    let (contract_block, deployment_ids) = init_factory::init_free_mint_block()?;
+    index_block(&contract_block, block_height)?;
+    
+    init_factory::assert_free_mint_deployed(&deployment_ids)?;
+    
+    // Create a new token with specific parameters
+    let token_cellpacks: Vec<Cellpack> = [
+        Cellpack {
+            target: AlkaneId {
+                block: deployment_ids.free_mint_factory.block,
+                tx: ALKANE_FACTORY_FREE_MINT_ID,
+            },
+            inputs: vec![0, 1000, 1000, 100, 0x414243, 0x58595A],
+        },
+    ]
+    .into();
+    
+    // Create a new block with the token creation transaction
+    let token_block = alkane_helpers::init_with_multiple_cellpacks_with_tx(
+        [vec![]].into(),
+        token_cellpacks,
+    );
+    
+    index_block(&token_block, block_height + 1)?;
+    
+    // Mint a token to update the minted count and total supply
+    let mint_cellpacks: Vec<Cellpack> = [
+        Cellpack {
+            target: AlkaneId {
+                block: deployment_ids.free_mint_factory.block,
+                tx: ALKANE_FACTORY_FREE_MINT_ID,
+            },
+            inputs: vec![77],
+        },
+    ]
+    .into();
+    
+    // Create a new block with the mint transaction
+    let mint_block = alkane_helpers::init_with_multiple_cellpacks_with_tx(
+        [vec![]].into(),
+        mint_cellpacks,
+    );
+    
+    index_block(&mint_block, block_height + 2)?;
+    
+    // Create a new block for testing the token details
+    let mut test_block = protorune::test_helpers::create_block_with_coinbase_tx(block_height + 3);
+    
+    // Call opcode 999 on the token to get its details
+    test_block.txdata.push(
+        alkane_helpers::create_multiple_cellpack_with_witness_and_in(
+            bitcoin::Witness::new(),
+            vec![Cellpack {
+                target: AlkaneId {
+                    block: deployment_ids.free_mint_factory.block,
+                    tx: ALKANE_FACTORY_FREE_MINT_ID,
+                },
+                inputs: vec![999],
+            }],
+            OutPoint {
+                txid: mint_block.txdata[mint_block.txdata.len() - 1].compute_txid(),
+                vout: 0,
+            },
+            false,
+        ),
+    );
+    
+    index_block(&test_block, block_height + 3)?;
+    
+    // Get the trace data from the transaction
+    let outpoint = OutPoint {
+        txid: test_block.txdata[test_block.txdata.len() - 1].compute_txid(),
+        vout: 3,
+    };
+    
+    let trace_data = view::trace(&outpoint)?;
+    
+    let mut out = stdout();
+    writeln!(out, "Token details trace data: {:?}", trace_data)?;
+    
+    // Convert trace data to string for easier searching
+    let trace_str = String::from_utf8_lossy(&trace_data);
+    
+    // Verify the trace data contains the expected values
+    assert!(
+        trace_str.contains("CBA"),
+        "Trace data should contain the name 'CBA', but it doesn't"
+    );
+    
+    assert!(
+        trace_str.contains("ZYX"),
+        "Trace data should contain the symbol 'ZYX', but it doesn't"
+    );
+    
+    // For a more thorough test, we could parse the binary data and verify each field
+    // But for simplicity, we'll just check that the expected strings are present
+    
+    writeln!(out, "Token details successfully retrieved and verified")?;
+    
+    Ok(())
+}

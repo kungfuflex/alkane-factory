@@ -2,3 +2,6 @@
 src/tests/std
 .DS_Store
 .vscode
+opcode-999-implementation-plan.md
+memory-bank/progress.md
+memory-bank/activeContext.md
